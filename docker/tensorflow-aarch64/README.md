@@ -90,7 +90,7 @@ TensorFlow can optionally be built with oneDNN, using the '--onednn' or '--dnnl'
 Without the '--onednn' flag, the default Eigen backend of Tensorflow is chosen. For the final TensorFlow image with oneDNN: This will generate an image 'tensorflow-v$tf_version$onednn_blas with the type of onednn backend chosen.
 
 Memory requirements for building TensorFlow can be singificant, and may exceed the available
-memory, paricuarly for parallel builds (the default). There are two flags which can be used to
+memory, particularly for parallel builds (the default). There are two flags which can be used to
 control the resources Bazel consumes:
 
   * --jobs sets the number of jobs to run in parallel during the build, this will apply to all parallel builds/
