@@ -24,7 +24,7 @@ pip install ck
 ck pull repo:ck-env
 pip install scikit-build
 sudo apt-get -y install protobuf-compiler libprotoc-dev
-https://github.com/mlcommons/inference.git --recursive
+git clone https://github.com/mlcommons/inference.git --recursive
 cd inference
 git checkout master
 cd loadgen
