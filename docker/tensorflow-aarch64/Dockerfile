@@ -220,7 +220,7 @@ RUN pip install --no-cache-dir ck absl-py pycocotools
 #RUN $PACKAGE_DIR/build-opencv.sh
 # --
 # 2 - install opencv-python-headless
-RUN pip install --no-cache-dir --no-binary :all: opencv-python-headless
+RUN pip install --no-cache-dir --no-binary :all: opencv-python-headless==4.4.0.46
 
 CMD ["bash", "-l"]
 

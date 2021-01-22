@@ -24,7 +24,6 @@ pip install cython
 pip install absl-py pillow pycocotools
 pip install ck
 ck pull repo:ck-env
-pip install scikit-build
 sudo apt-get -y install protobuf-compiler libprotoc-dev
 git clone https://github.com/mlcommons/inference.git --recursive
 cd inference
