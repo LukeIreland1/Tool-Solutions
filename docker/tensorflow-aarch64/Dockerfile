@@ -184,7 +184,7 @@ ENV PATH="$VENV_DIR/bin:$PATH"
 
 # Install some basic python packages
 RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir "setuptools>=41.0.0" six mock wheel cython
+RUN pip install --no-cache-dir "setuptools>=41.0.0" six mock wheel cython sh
 
 # Build numpy from source, using OpenBLAS for BLAS calls
 COPY scripts/build-numpy.sh $PACKAGE_DIR/.
