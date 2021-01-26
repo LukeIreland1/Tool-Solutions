@@ -200,12 +200,13 @@ RUN $PACKAGE_DIR/build-scipy.sh
 
 # Install some TensorFlow essentials
 RUN pip install --no-cache-dir keras_applications==1.0.8 --no-deps
-RUN pip install --no-cache-dir keras_preprocessing==1.1.0 --no-deps
+RUN pip install --no-cache-dir keras_preprocessing==1.1.2 --no-deps
 # enum34 is not compatible with Python 3.6+, and not required
 # it is installed as a dependency for an earlier package and needs
 # to be removed in order for the OpenCV build to complete.
 RUN pip uninstall enum34 -y
-RUN HDF5_DIR=/usr/lib/aarch64-linux-gnu/hdf5/serial pip install h5py
+RUN HDF5_DIR=/usr/lib/aarch64-linux-gnu/hdf5/serial pip install h5py==2.10.0
+RUN pip install --no-cache-dir grpcio
 RUN pip install --no-cache-dir ck absl-py pycocotools
 
 # Install OpenCV into our venv,
