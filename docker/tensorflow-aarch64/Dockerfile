@@ -207,7 +207,7 @@ RUN pip install --no-cache-dir keras_preprocessing==1.1.2 --no-deps
 RUN pip uninstall enum34 -y
 RUN HDF5_DIR=/usr/lib/aarch64-linux-gnu/hdf5/serial pip install h5py==2.10.0
 RUN pip install --no-cache-dir grpcio
-RUN pip install --no-cache-dir ck absl-py pycocotools
+RUN pip install --no-cache-dir ck absl-py pycocotools pillow
 
 # Install OpenCV into our venv,
 # Note: Scripts are provided to build and install OpenCV from the
