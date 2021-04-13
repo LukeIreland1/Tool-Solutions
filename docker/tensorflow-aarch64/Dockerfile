@@ -291,7 +291,7 @@ RUN $PACKAGE_DIR/build-tensorflow.sh
 CMD ["bash", "-l"]
 
 # ========
-# Stage 5: Install benchmarks
+# Stage 5: Install benchmarks and examples
 # ========
 FROM tensorflow-libs AS tensorflow
 
@@ -307,13 +307,25 @@ ENV PATH="$VENV_DIR/bin:$PATH"
 COPY scripts/build-benchmarks.sh /home/$DOCKER_USER/.
 RUN /home/$DOCKER_USER/build-benchmarks.sh
 
+# Examples, benchmarks, and associated 'helper' scripts will be installed within
+# in $EXAMPLE_DIR.
+ENV EXAMPLE_DIR=/home/$DOCKER_USER/examples
+RUN mkdir -p $EXAMPLE_DIR
+RUN mkdir -p $EXAMPLE_DIR/MLCommons
+
+# Clone and install MLCommons (MLPerf)
 COPY patches/optional-mlcommons-changes.patch /home/$DOCKER_USER/optional-mlcommons-changes.patch
 # Clone and install  MLCommons (MLPerf)
 COPY scripts/build-mlcommons.sh /home/$DOCKER_USER/.
 RUN /home/$DOCKER_USER/build-mlcommons.sh
-
 # Copy scripts to download dataset and models
-COPY scripts/download-dataset.sh /home/$DOCKER_USER/.
-COPY scripts/download-model.sh /home/$DOCKER_USER/.
+COPY scripts/download-dataset.sh $EXAMPLE_DIR/MLCommons/.
+COPY scripts/download-model.sh $EXAMPLE_DIR/MLCommons/.
+
+# Install missing Python package dependencies required to run examples
+RUN pip install --no-cache-dir pyyaml
+RUN pip install --no-cache-dir tqdm
+# Copy examples
+ADD examples $EXAMPLE_DIR
 
 CMD ["bash", "-l"]
