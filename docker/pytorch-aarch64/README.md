@@ -21,8 +21,8 @@ aarch64
     - NumPy 1.19.5
     - SciPy 1.5.2
     - PyTorch 1.8.1
-  * PyTorch examples, and some key dependencies such as Matplotlib.
   * [ML Commons :TM: (MLPerf)](https://mlperf.org/)
+  * [Example scripts](./examples/README.md) that demonstrate how to run ML models
 A user account with username 'ubuntu' is created with sudo privaleges and password of 'Portland'.
 
 In addition to the Dockerfile, please look at the files in the scripts/ directory and the patches/ directory too see how the software is built.
@@ -54,7 +54,7 @@ Use the build.sh script to build the image. This script implements a multi-stage
   * Stage 2: 'libs' image including essential tools and libraries such as Python and OpenBLAS.
   * Stage 3: 'tools' image, including a Python3 virtual environment in userspace and a build of NumPy against OpenBLAS, as well as other Python essentials.
   * Stage 4: 'dev' image, including PyTorch with sources
-  * Stage 5: 'pytorch' image, including only the Python3 virtual environment, the PyTorch module, and the basic examples. PyTorch sources are not included in this image.
+  * Stage 5: 'pytorch' image, including only the Python3 virtual environment, the PyTorch module, and the example scripts. PyTorch sources are not included in this image.
 
 To see the command line options for build.sh use:
 
@@ -92,22 +92,3 @@ where <image name> is the name of the finished image, for example 'pytorch'.
 To display available images use the Docker command:
 
   ``` > docker images ```
-
-## Running MLCommons benchmark
-
-To run ResNet34-ssd with the COCO 2017 validation dataset for object detection, download the dataset and model using the example scripts provided in the `examples/MLCommons` directory of the final image.
-  * `download-dataset.sh` downloads the Coco 2017 dataset using CK to `${HOME}/CK-TOOLS/`
-  * `download-models.sh` downloads the resnet34-ssd model.
-
-Set `DATA_DIR` to the location of the downloaded dataset and `MODEL_DIR` to the location of the downloaded model.
-
-  ``` > export DATA_DIR=${HOME}/CK-TOOLS/dataset-coco-2017-val ```
-
-  ``` > export MODEL_DIR=$(pwd) ```
-
-From `examples/MLCommons/inference/vision/classification_and_detection` use the `run_local.sh` to start the benchmark.
-  ``` > ./run_local.sh pytorch ssd-resnet34 cpu ```
-
-_Note: use DNNL_VERBOSE=1 to verify the build uses oneDNN when running the benchmarks._
-
-Please refer to (https://github.com/mlperf/inference/tree/master/vision/classification_and_detection) for further details.

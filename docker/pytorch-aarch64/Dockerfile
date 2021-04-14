@@ -274,4 +274,12 @@ RUN $PACKAGE_DIR/build-mlcommons.sh
 COPY scripts/download-dataset.sh $EXAMPLE_DIR/MLCommons/.
 COPY scripts/download-model.sh $EXAMPLE_DIR/MLCommons/.
 
+# Install missing Python package dependencies required to run examples
+RUN pip install --no-cache-dir requests
+RUN pip install --no-cache-dir tqdm
+
+# Copy examples
+ENV EXAMPLE_DIR=/home/$DOCKER_USER/examples
+ADD examples $EXAMPLE_DIR
+
 CMD ["bash", "-l"]
