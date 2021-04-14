@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # *******************************************************************************
-# Copyright 2020 Arm Limited and affiliates.
+# Copyright 2020-2021 Arm Limited and affiliates.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,9 +33,6 @@ git checkout v$version -b v$version
 git submodule sync
 git submodule update --init --recursive
 
-# Patch to avoid using asm not supported for GCC builds.
-curl https://patch-diff.githubusercontent.com/raw/pytorch/pytorch/pull/35157.patch | patch -p1
-
 if [[ $ONEDNN_BUILD ]]; then
   # Patch to enable oneDNN (MKL-DNN).
   patch -p1 < $PACKAGE_DIR/pytorch_onednn.patch
@@ -45,16 +42,14 @@ if [[ $ONEDNN_BUILD ]]; then
     reference )
     ;;
     acl )
-    export USE_ACL="ON"
+    export USE_MKLDNN_ACL="ON"
     ;;
   esac
-
 fi
 
 # Update the oneDNN tag in third_party/ideep
 cd third_party/ideep/mkl-dnn
 git checkout $ONEDNN_VERSION
-patch -p1 < $PACKAGE_DIR/onednn_acl_verbose.patch
 
 cd $PACKAGE_DIR/$src_repo
 
@@ -62,11 +57,14 @@ MAX_JOBS=${NP_MAKE:-$((num_cpus / 2))} OpenBLAS_HOME=$OPENBLAS_DIR/lib CXX_FLAGS
 
 # Check the installation was sucessfull
 cd $HOME
-python -c 'import torch; print(torch.__version__)' > version.log
-if grep $version version.log; then
-  echo "PyTorch $TORCH_VERSION package installed."
+
+# Check the wheel has installed ocrrectly.
+# Note: only checks the major.minor version numbers, and not the point release
+check_version=$(python -c 'import torch; print(torch.__version__)' | cut -f1,2 -d'.')
+required_version=$(echo $version | cut -f1,2 -d'.')
+if [[ "$check_version" == "$required_version" ]]; then
+  echo "PyTorch $required_version package installed."
 else
   echo "PyTorch package installation failed."
   exit 1
 fi
-rm $HOME/version.log

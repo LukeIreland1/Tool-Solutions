@@ -13,17 +13,17 @@ aarch64
 
 ## What's in the final image?
   * OS: Ubuntu 18.04
-  * Compiler: GCC 9.2
-  * Maths libraries: [Arm Optimized Routines](https://github.com/ARM-software/optimized-routines) and [OpenBLAS](https://www.openblas.net/) 0.3.9
-  * [oneDNN](https://github.com/oneapi-src/oneDNN) 1.7.
-    - [Arm Compute library](https://developer.arm.com/ip-products/processors/machine-learning/compute-library) 20.08, providing AArch64 optimised primitives for oneDNN>
+  * Compiler: GCC 9.3
+  * Maths libraries: [Arm Optimized Routines](https://github.com/ARM-software/optimized-routines) and [OpenBLAS](https://www.openblas.net/) 0.3.10
+  * [oneDNN](https://github.com/oneapi-src/oneDNN) 2.2.
+    - [Compute Library for the Arm architecture](https://developer.arm.com/ip-products/processors/machine-learning/compute-library) 21.02, providing AArch64 optimised primitives for oneDNN.>
   * Python3 environment built from CPython 3.8 and containing:
-    - NumPy 1.19.1
+    - NumPy 1.19.5
     - SciPy 1.5.2
-    - PyTorch 1.6
-  * PyTorch examples, and some key dependencies such as Matplolib.
-  * [MLCommons (MLPerf)](https://mlperf.org/)
-A user account with username 'ubuntu' is created with sudo privaleges and password of 'Arm2020'.
+    - PyTorch 1.8.1
+  * PyTorch examples, and some key dependencies such as Matplotlib.
+  * [ML Commons :TM: (MLPerf)](https://mlperf.org/)
+A user account with username 'ubuntu' is created with sudo privaleges and password of 'Portland'.
 
 In addition to the Dockerfile, please look at the files in the scripts/ directory and the patches/ directory too see how the software is built.
 
@@ -94,14 +94,20 @@ To display available images use the Docker command:
   ``` > docker images ```
 
 ## Running MLCommons benchmark
-Please refer to (https://github.com/mlperf/inference/tree/master/vision/classification_and_detection) for instructions to download datasets and models. Examples scripts are provided in the $HOME directory of the final image.
 
-To run resnet34 on coco dataset for object detection:
+To run ResNet34-ssd with the COCO 2017 validation dataset for object detection, download the dataset and model using the example scripts provided in the `examples/MLCommons` directory of the final image.
+  * `download-dataset.sh` downloads the Coco 2017 dataset using CK to `${HOME}/CK-TOOLS/`
+  * `download-models.sh` downloads the resnet34-ssd model.
+
+Set `DATA_DIR` to the location of the downloaded dataset and `MODEL_DIR` to the location of the downloaded model.
 
   ``` > export DATA_DIR=${HOME}/CK-TOOLS/dataset-coco-2017-val ```
 
   ``` > export MODEL_DIR=$(pwd) ```
 
+From `examples/MLCommons/inference/vision/classification_and_detection` use the `run_local.sh` to start the benchmark.
   ``` > ./run_local.sh pytorch ssd-resnet34 cpu ```
 
-Use MKLDNN_VERBOSE=1 to verify the build uses oneDNN when running the benchmarks.
+_Note: use DNNL_VERBOSE=1 to verify the build uses oneDNN when running the benchmarks._
+
+Please refer to (https://github.com/mlperf/inference/tree/master/vision/classification_and_detection) for further details.
