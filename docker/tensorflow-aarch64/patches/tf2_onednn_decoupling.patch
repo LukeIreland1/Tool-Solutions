@@ -33,7 +33,7 @@ index 24446d846c..f9b1122ee9 100755
 -            "https://storage.googleapis.com/mirror.tensorflow.org/github.com/oneapi-src/oneDNN/archive/v1.4.tar.gz",
 -            "https://github.com/oneapi-src/oneDNN/archive/v1.4.tar.gz",
 -        ],
-+        path = '/opt/onednn/release/oneDNN'
++        path = '/opt/onednn/release'
      )
  
      tf_http_archive(  

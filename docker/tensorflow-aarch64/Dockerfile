@@ -64,6 +64,7 @@ RUN apt-get -y update && \
       openssl \
       python-openssl \
       rsync \
+      scons \
       ssh \
       sudo \
       time \
@@ -82,7 +83,7 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 1 --slave /usr
 ENV DOCKER_USER=ubuntu
 
 # Setup default user
-RUN useradd --create-home -s /bin/bash -m $DOCKER_USER && echo "$DOCKER_USER:Arm2020" | chpasswd && adduser $DOCKER_USER sudo
+RUN useradd --create-home -s /bin/bash -m $DOCKER_USER && echo "$DOCKER_USER:Portland" | chpasswd && adduser $DOCKER_USER sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
@@ -110,6 +111,7 @@ ENV NP_MAKE="${njobs}" \
 
 # Key version numbers
 ENV PY_VERSION=3.7.0 \
+    ACL_VERSION="v21.02" \
     ARMPL_VERSION=20.2.1 \
     OPENBLAS_VERSION=0.3.9
 
@@ -147,13 +149,23 @@ RUN $PACKAGE_DIR/build-openblas.sh
 ENV OPENBLAS_DIR=$PROD_DIR/openblas/$OPENBLAS_VERSION
 ENV LD_LIBRARY_PATH=$OPENBLAS_DIR/lib:$LD_LIBRARY_PATH
 
+# Build Compute Library from source
+COPY scripts/build-acl.sh $PACKAGE_DIR/.
+RUN $PACKAGE_DIR/build-acl.sh
+ENV ACL_ROOT_DIR=$PROD_DIR/acl/ComputeLibrary
+ENV LD_LIBRARY_PATH=$ACL_ROOT_DIR/build:$LD_LIBRARY_PATH
+
 # Build oneDNN from source
 COPY scripts/build-onednn.sh $PACKAGE_DIR/.
 # Patch for oneDNN (MKL-DNN), v0.21.3
 COPY patches/mkldnn.patch $PACKAGE_DIR/mkldnn.patch
+# Patch for oneDNN  v1.x
+COPY patches/oneDNN.patch $PACKAGE_DIR/oneDNN.patch
+# Build oneDNN ACL/reference
+RUN $PACKAGE_DIR/build-onednn.sh
 ENV ONEDNN_DIR=$PROD_DIR/onednn/release
 ENV LD_LIBRARY_PATH=$ONEDNN_DIR/lib:$LD_LIBRARY_PATH
-# Get oneDNN sources
+# Get oneDNN sources for ArmPL and OpenBLAS builds
 # Built as part of the bazel build step in TensorFlow
 COPY scripts/get-onednn.sh $PACKAGE_DIR/.
 RUN $PACKAGE_DIR/get-onednn.sh
@@ -207,7 +219,7 @@ RUN pip install --no-cache-dir keras_preprocessing==1.1.2 --no-deps
 RUN pip uninstall enum34 -y
 RUN HDF5_DIR=/usr/lib/aarch64-linux-gnu/hdf5/serial pip install h5py==2.10.0
 RUN pip install --no-cache-dir grpcio
-RUN pip install --no-cache-dir  ck==1.55.5 absl-py pycocotools pillow
+RUN pip install --no-cache-dir ck==1.55.5 absl-py pycocotools pillow
 
 # Install OpenCV into our venv,
 # Note: Scripts are provided to build and install OpenCV from the
@@ -273,6 +285,7 @@ COPY patches/oneDNN-opensource.patch $PACKAGE_DIR/oneDNN-opensource.patch
 COPY patches/tf2-armpl.patch $PACKAGE_DIR/tf2-armpl.patch
 COPY patches/tf2-openblas.patch $PACKAGE_DIR/tf2-openblas.patch
 COPY patches/tf2-acl.patch $PACKAGE_DIR/tf2-acl.patch
+COPY patches/tf2-onednn-explicit.patch $PACKAGE_DIR/tf2-onednn-explicit.patch
 RUN $PACKAGE_DIR/build-tensorflow.sh
 
 CMD ["bash", "-l"]
